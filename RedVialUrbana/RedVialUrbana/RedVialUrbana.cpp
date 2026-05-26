@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <queue>
+#include <utility>
 
 using namespace std;
 
@@ -20,6 +22,37 @@ struct EdgeData {
     int oneway;
     string maxspeed;
 };
+
+// Función BFS para contar nodos alcanzables en máximo 5 km
+int contarAlcanzablesEn5km(int startNode, const vector<vector<pair<int, double>>>& graph) {
+    int n = graph.size();
+    vector<bool> visited(n, false);
+    vector<double> dist(n, 0.0);
+    queue<int> q;
+
+    visited[startNode] = true;
+    q.push(startNode);
+    int count = 1; // El nodo origen se cuenta a sí mismo
+
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+
+        for (const auto& edge : graph[u]) {
+            int v = edge.first;
+            double weight = edge.second;
+
+            if (!visited[v] && dist[u] + weight <= 5000.0) { // 5000 metros = 5 km
+                visited[v] = true;
+                dist[v] = dist[u] + weight;
+                q.push(v);
+                count++;
+            }
+        }
+    }
+
+    return count;
+}
 
 int main() {
     ifstream nodesFile("nodes.csv");
@@ -110,6 +143,14 @@ int main() {
     for (int i = 0; i < 5 && i < numNodes; i++) {
         cout << "Nodo " << i << " tiene " << graph[i].size() << " vecinos" << endl;
     }
+
+    // --------------------------------
+// 5. PRUEBA: Alcance vehicular desde el nodo 0
+// --------------------------------
+    cout << "\n--- ALCANCE VEHICULAR (5 km) ---" << endl;
+    int start = 0; // Puedes cambiar el nodo de inicio
+    int reachable = contarAlcanzablesEn5km(start, graph);
+    cout << "Desde el nodo " << start << " se pueden alcanzar " << reachable << " nodos (incluyendo el propio) en máximo 5 km." << endl;
 
     cout << "Listo. El grafo esta cargado en memoria." << endl;
 
