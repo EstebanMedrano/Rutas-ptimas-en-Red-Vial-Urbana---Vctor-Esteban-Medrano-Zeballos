@@ -23,7 +23,6 @@ struct EdgeData {
     string maxspeed;
 };
 
-// Función BFS para contar nodos alcanzables en máximo 5 km
 int contarAlcanzablesEn5km(int startNode, const vector<vector<pair<int, double>>>& graph) {
     int n = graph.size();
     vector<bool> visited(n, false);
@@ -32,7 +31,7 @@ int contarAlcanzablesEn5km(int startNode, const vector<vector<pair<int, double>>
 
     visited[startNode] = true;
     q.push(startNode);
-    int count = 1; // El nodo origen se cuenta a sí mismo
+    int count = 1;
 
     while (!q.empty()) {
         int u = q.front();
@@ -42,7 +41,7 @@ int contarAlcanzablesEn5km(int startNode, const vector<vector<pair<int, double>>
             int v = edge.first;
             double weight = edge.second;
 
-            if (!visited[v] && dist[u] + weight <= 5000.0) { // 5000 metros = 5 km
+            if (!visited[v] && dist[u] + weight <= 5000.0) {
                 visited[v] = true;
                 dist[v] = dist[u] + weight;
                 q.push(v);
@@ -144,11 +143,8 @@ int main() {
         cout << "Nodo " << i << " tiene " << graph[i].size() << " vecinos" << endl;
     }
 
-    // --------------------------------
-// 5. PRUEBA: Alcance vehicular desde el nodo 0
-// --------------------------------
     cout << "\n--- ALCANCE VEHICULAR (5 km) ---" << endl;
-    int start = 0; // Puedes cambiar el nodo de inicio
+    int start = 0; 
     int reachable = contarAlcanzablesEn5km(start, graph);
     cout << "Desde el nodo " << start << " se pueden alcanzar " << reachable << " nodos (incluyendo el propio) en máximo 5 km." << endl;
 
