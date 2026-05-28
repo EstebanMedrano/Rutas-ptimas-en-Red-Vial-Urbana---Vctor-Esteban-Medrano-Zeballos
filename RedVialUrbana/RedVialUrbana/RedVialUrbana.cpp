@@ -75,10 +75,17 @@ int main() {
         getline(ss, latStr, ',');
         getline(ss, lonStr, ',');
 
-        long long originalId = stoll(idStr);
-        nodeIdToIndex[originalId] = currentIndex;
-        nodeData.push_back({ stod(latStr), stod(lonStr) });
-        currentIndex++;
+        if (idStr.empty() || latStr.empty() || lonStr.empty()) continue;
+
+        try {
+            long long originalId = stoll(idStr);
+            nodeIdToIndex[originalId] = currentIndex;
+            nodeData.push_back({ stod(latStr), stod(lonStr) });
+            currentIndex++;
+        }
+        catch (...) {
+            continue;
+        }
     }
     nodesFile.close();
 
@@ -92,7 +99,6 @@ int main() {
     }
 
     getline(edgesFile, line);
-
     vector<EdgeData> edges;
 
     while (getline(edgesFile, line)) {
@@ -107,21 +113,31 @@ int main() {
         getline(ss, onewayStr, ',');
         getline(ss, maxspeedStr, ',');
 
-        long long fromId = stoll(fromStr);
-        long long toId = stoll(toStr);
-        double distance = stod(distStr);
-        int oneway = stoi(onewayStr);
+        if (fromStr.empty() || toStr.empty() || distStr.empty()) continue;
 
-        if (nodeIdToIndex.find(fromId) != nodeIdToIndex.end() &&
-            nodeIdToIndex.find(toId) != nodeIdToIndex.end()) {
+        try {
+            long long fromId = stoll(fromStr);
+            long long toId = stoll(toStr);
+            double distance = stod(distStr);
+            int oneway = stoi(onewayStr);
 
-            edges.push_back({ fromId, toId, distance, fclassStr, oneway, maxspeedStr });
+            if (distance <= 0) continue;
+            if (oneway != 0 && oneway != 1) continue;
+            if (fclassStr.empty()) continue;
+
+            if (nodeIdToIndex.find(fromId) != nodeIdToIndex.end() &&
+                nodeIdToIndex.find(toId) != nodeIdToIndex.end()) {
+                edges.push_back({ fromId, toId, distance, fclassStr, oneway, maxspeedStr });
+            }
+        }
+        catch (...) {
+            continue;
         }
     }
     edgesFile.close();
 
     int numEdges = edges.size();
-    cout << "Aristas cargadas : " << numEdges << endl;
+    cout << "Aristas cargadas: " << numEdges << endl;
 
     vector<vector<pair<int, double>>> graph(numNodes);
 
@@ -143,13 +159,12 @@ int main() {
         cout << "Nodo " << i << " tiene " << graph[i].size() << " vecinos" << endl;
     }
 
-    cout << "\n--- ALCANCE VEHICULAR (5 km) ---" << endl;
-    int start = 0; 
+    cout << "--- ALCANCE VEHICULAR (5 km) ---" << endl;
+    int start = 0;
     int reachable = contarAlcanzablesEn5km(start, graph);
     cout << "Desde el nodo " << start << " se pueden alcanzar " << reachable << " nodos (incluyendo el propio) en máximo 5 km." << endl;
 
     cout << "Listo. El grafo esta cargado en memoria." << endl;
-
     cout << "Presiona Enter para salir..." << endl;
     cin.get();
 
