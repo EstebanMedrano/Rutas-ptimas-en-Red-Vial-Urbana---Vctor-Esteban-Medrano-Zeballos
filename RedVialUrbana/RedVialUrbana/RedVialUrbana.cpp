@@ -53,6 +53,47 @@ int contarAlcanzablesEn5km(int startNode, const vector<vector<pair<int, double>>
     return count;
 }
 
+void encontrarComponentesConexas(const vector<vector<pair<int, double>>>& graph) {
+    int n = graph.size();
+    vector<bool> visited(n, false);
+
+    int totalComponentes = 0;
+    int componenteGigante = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            totalComponentes++;
+            int size = 0;
+            queue<int> q;
+            q.push(i);
+            visited[i] = true;
+
+            while (!q.empty()) {
+                int u = q.front();
+                q.pop();
+                size++;
+
+                for (const auto& edge : graph[u]) {
+                    int v = edge.first;
+                    if (!visited[v]) {
+                        visited[v] = true;
+                        q.push(v);
+                    }
+                }
+            }
+
+            if (size > componenteGigante) {
+                componenteGigante = size;
+            }
+        }
+    }
+
+    cout << "--- COMPONENTES CONEXAS ---" << endl;
+    cout << "Total de islas (componentes): " << totalComponentes << endl;
+    cout << "Tamaño de la red principal (componente gigante): " << componenteGigante << " nodos" << endl;
+}
+
+
 int main() {
     ifstream nodesFile("nodes.csv");
     if (!nodesFile.is_open()) {
@@ -119,7 +160,10 @@ int main() {
             long long fromId = stoll(fromStr);
             long long toId = stoll(toStr);
             double distance = stod(distStr);
-            int oneway = stoi(onewayStr);
+            int oneway = 0;
+            if (onewayStr == "T" || onewayStr == "t" || onewayStr == "true" || onewayStr == "yes" || onewayStr == "1") {
+                oneway = 1;
+            }
 
             if (distance <= 0) continue;
             if (oneway != 0 && oneway != 1) continue;
@@ -147,9 +191,7 @@ int main() {
         double weight = e.distance_m;
 
         graph[u].push_back({ v, weight });
-        if (e.oneway == 0) {
-            graph[v].push_back({ u, weight });
-        }
+        graph[v].push_back({ u, weight });
     }
 
     cout << "Grafo construido con " << numNodes << " nodos y " << numEdges << " aristas (con bidireccionalidad)." << endl;
@@ -157,6 +199,59 @@ int main() {
     cout << "--- PRUEBA RAPIDA ---" << endl;
     for (int i = 0; i < 5 && i < numNodes; i++) {
         cout << "Nodo " << i << " tiene " << graph[i].size() << " vecinos" << endl;
+    }       
+
+    encontrarComponentesConexas(graph);
+
+    vector<int> nodosComponenteGigante;
+    {
+        int n = graph.size();
+        vector<bool> visited(n, false);
+        int maxSize = 0;
+        int maxStart = 0;
+
+        for (int i = 0; i < n; i++) {
+            if (!visited[i]) {
+                int size = 0;
+                queue<int> q;
+                q.push(i);
+                visited[i] = true;
+                while (!q.empty()) {
+                    int u = q.front();
+                    q.pop();
+                    size++;
+                    for (const auto& edge : graph[u]) {
+                        int v = edge.first;
+                        if (!visited[v]) {
+                            visited[v] = true;
+                            q.push(v);
+                        }
+                    }
+                }
+                if (size > maxSize) {
+                    maxSize = size;
+                    maxStart = i;
+                }
+            }
+        }
+
+        visited.assign(n, false);
+        queue<int> q;
+        q.push(maxStart);
+        visited[maxStart] = true;
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            nodosComponenteGigante.push_back(u);
+            for (const auto& edge : graph[u]) {
+                int v = edge.first;
+                if (!visited[v]) {
+                    visited[v] = true;
+                    q.push(v);
+                }
+            }
+        }
+        cout << "Nodos en la componente gigante: " << nodosComponenteGigante.size() << endl;
     }
 
     cout << "--- ALCANCE VEHICULAR (5 km) ---" << endl;
