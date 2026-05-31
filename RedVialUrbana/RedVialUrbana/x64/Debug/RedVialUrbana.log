@@ -1,0 +1,7 @@
+﻿  RedVialUrbana.cpp
+C:\Users\esteb\OneDrive\Documentos\Universidad Esteban\8vo semestre\analisis de algoritmo\proyecto final\RedVialUrbana\RedVialUrbana\RedVialUrbana.cpp(28,11): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\esteb\OneDrive\Documentos\Universidad Esteban\8vo semestre\analisis de algoritmo\proyecto final\RedVialUrbana\RedVialUrbana\RedVialUrbana.cpp(58,11): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\esteb\OneDrive\Documentos\Universidad Esteban\8vo semestre\analisis de algoritmo\proyecto final\RedVialUrbana\RedVialUrbana\RedVialUrbana.cpp(130,11): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\esteb\OneDrive\Documentos\Universidad Esteban\8vo semestre\analisis de algoritmo\proyecto final\RedVialUrbana\RedVialUrbana\RedVialUrbana.cpp(253,18): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
+C:\Users\esteb\OneDrive\Documentos\Universidad Esteban\8vo semestre\analisis de algoritmo\proyecto final\RedVialUrbana\RedVialUrbana\RedVialUrbana.cpp(278,15): warning C4267: 'inicializando': conversión de 'size_t' a 'int'; posible pérdida de datos
+  RedVialUrbana.vcxproj -> C:\Users\esteb\OneDrive\Documentos\Universidad Esteban\8vo semestre\analisis de algoritmo\proyecto final\RedVialUrbana\x64\Debug\RedVialUrbana.exe

@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <queue>
 #include <utility>
+#include <algorithm>
 
 using namespace std;
 
@@ -89,8 +90,77 @@ void encontrarComponentesConexas(const vector<vector<pair<int, double>>>& graph)
     }
 
     cout << "--- COMPONENTES CONEXAS ---" << endl;
-    cout << "Total de islas (componentes): " << totalComponentes << endl;
-    cout << "Tamaño de la red principal (componente gigante): " << componenteGigante << " nodos" << endl;
+    cout << "Total de islas: " << totalComponentes << endl;
+    cout << "Tamaño de la red principal: " << componenteGigante << " nodos" << endl;
+}
+
+struct DSU {
+    vector<int> parent, rank;
+    DSU(int n) {
+        parent.resize(n);
+        rank.resize(n, 0);
+        for (int i = 0; i < n; i++) parent[i] = i;
+    }
+    int find(int x) {
+        if (parent[x] != x) parent[x] = find(parent[x]);
+        return parent[x];
+    }
+    bool unite(int x, int y) {
+        int rx = find(x), ry = find(y);
+        if (rx == ry) return false;
+        if (rank[rx] < rank[ry]) parent[rx] = ry;
+        else if (rank[rx] > rank[ry]) parent[ry] = rx;
+        else { parent[ry] = rx; rank[rx]++; }
+        return true;
+    }
+};
+
+struct EdgeKruskal {
+    int u, v;
+    double w;
+    bool operator<(const EdgeKruskal& other) const { return w < other.w; }
+};
+
+void construirMST(const vector<vector<pair<int, double>>>& graph, const vector<int>& nodosComponente) {
+    unordered_map<int, int> globalToLocal;
+    for (int i = 0; i < nodosComponente.size(); i++) {
+        globalToLocal[nodosComponente[i]] = i;
+    }
+
+    int n = nodosComponente.size();
+    vector<EdgeKruskal> edges;
+
+    for (int uGlobal : nodosComponente) {
+        int uLocal = globalToLocal[uGlobal];
+        for (const auto& edge : graph[uGlobal]) {
+            int vGlobal = edge.first;
+            double weight = edge.second;
+            if (globalToLocal.find(vGlobal) != globalToLocal.end()) {
+                int vLocal = globalToLocal[vGlobal];
+                if (uLocal < vLocal) {
+                    edges.push_back({ uLocal, vLocal, weight });
+                }
+            }
+        }
+    }
+
+    sort(edges.begin(), edges.end());
+
+    DSU dsu(n);
+    double totalWeight = 0;
+    int edgesTaken = 0;
+
+    cout << "Construyendo MST sobre la componente gigante" << endl;
+    for (const auto& e : edges) {
+        if (dsu.unite(e.u, e.v)) {
+            totalWeight += e.w;
+            edgesTaken++;
+            if (edgesTaken == n - 1) break;
+        }
+    }
+
+    cout << "Total de aristas en el MST: " << edgesTaken << endl;
+    cout << "Peso total del MST: " << totalWeight / 1000.0 << " km" << endl;
 }
 
 
@@ -194,7 +264,7 @@ int main() {
         graph[v].push_back({ u, weight });
     }
 
-    cout << "Grafo construido con " << numNodes << " nodos y " << numEdges << " aristas (con bidireccionalidad)." << endl;
+    cout << "Grafo construido con " << numNodes << " nodos y " << numEdges << " aristas" << endl;
 
     cout << "--- PRUEBA RAPIDA ---" << endl;
     for (int i = 0; i < 5 && i < numNodes; i++) {
@@ -254,13 +324,14 @@ int main() {
         cout << "Nodos en la componente gigante: " << nodosComponenteGigante.size() << endl;
     }
 
+    construirMST(graph, nodosComponenteGigante);
+
     cout << "--- ALCANCE VEHICULAR (5 km) ---" << endl;
     int start = 0;
     int reachable = contarAlcanzablesEn5km(start, graph);
-    cout << "Desde el nodo " << start << " se pueden alcanzar " << reachable << " nodos (incluyendo el propio) en máximo 5 km." << endl;
+    cout << "Desde el nodo " << start << " se pueden alcanzar " << reachable << " nodos en máximo 5 km." << endl;
 
-    cout << "Listo. El grafo esta cargado en memoria." << endl;
-    cout << "Presiona Enter para salir..." << endl;
+    cout << "El grafo esta cargado en memoria" << endl;
     cin.get();
 
     return 0;
