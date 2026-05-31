@@ -163,6 +163,56 @@ void construirMST(const vector<vector<pair<int, double>>>& graph, const vector<i
     cout << "Peso total del MST: " << totalWeight / 1000.0 << " km" << endl;
 }
 
+void encontrarDiametroSubmuestra(const vector<vector<pair<int, double>>>& graph, const vector<int>& nodosComponente, int muestra = 500) {
+    int n = graph.size();
+    unordered_map<int, int> globalToLocal;
+    for (int i = 0; i < nodosComponente.size(); i++) {
+        globalToLocal[nodosComponente[i]] = i;
+    }
+
+    int m = min(muestra, (int)nodosComponente.size());
+    double maxDist = 0.0;
+    int bestU = -1, bestV = -1;
+
+    cout << "--- DIÁMETRO VIAL (submuestra de " << m << " nodos) ---" << endl;
+
+    for (int idx = 0; idx < m; idx++) {
+        int startGlobal = nodosComponente[idx];
+
+        vector<double> dist(n, 1e18);
+        dist[startGlobal] = 0.0;
+        priority_queue<pair<double, int>, vector<pair<double, int>>, greater<pair<double, int>>> pq;
+        pq.push({ 0.0, startGlobal });
+
+        while (!pq.empty()) {
+            double d = pq.top().first;
+            int u = pq.top().second;
+            pq.pop();
+
+            if (d > dist[u]) continue;
+
+            for (const auto& edge : graph[u]) {
+                int v = edge.first;
+                double w = edge.second;
+                if (dist[u] + w < dist[v]) {
+                    dist[v] = dist[u] + w;
+                    pq.push({ dist[v], v });
+                }
+            }
+        }
+
+        for (int vGlobal : nodosComponente) {
+            if (dist[vGlobal] < 1e17 && dist[vGlobal] > maxDist) {
+                maxDist = dist[vGlobal];
+                bestU = startGlobal;
+                bestV = vGlobal;
+            }
+        }
+    }
+
+    cout << "Distancia máxima encontrada: " << maxDist / 1000.0 << " km" << endl;
+    cout << "Entre los nodos: " << bestU << " y " << bestV << endl;
+}
 
 int main() {
     ifstream nodesFile("nodes.csv");
@@ -325,6 +375,8 @@ int main() {
     }
 
     construirMST(graph, nodosComponenteGigante);
+
+    encontrarDiametroSubmuestra(graph, nodosComponenteGigante, 500);
 
     cout << "--- ALCANCE VEHICULAR (5 km) ---" << endl;
     int start = 0;
