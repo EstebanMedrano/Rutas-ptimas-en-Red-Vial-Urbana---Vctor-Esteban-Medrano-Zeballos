@@ -174,7 +174,7 @@ void encontrarDiametroSubmuestra(const vector<vector<pair<int, double>>>& graph,
     double maxDist = 0.0;
     int bestU = -1, bestV = -1;
 
-    cout << "--- DIÁMETRO VIAL (submuestra de " << m << " nodos) ---" << endl;
+    cout << "--- DIAMETRO VIAL (submuestra de " << m << " nodos) ---" << endl;
 
     for (int idx = 0; idx < m; idx++) {
         int startGlobal = nodosComponente[idx];
